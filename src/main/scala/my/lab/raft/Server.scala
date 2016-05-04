@@ -184,6 +184,7 @@ class Server(val id: Int) extends Actor {
       postAction(ReceivedFollowerTimeout(id))
       convertToCandidate
     }
+    //TODO i think follower should be converted to candidate (at least if it responds with a false) so it can be elected too
     case RequestVote(requesterTerm, candidateId, lastLogIndex, lastLogTerm) => {
       //i think we need to reset timeout when receiving RequestVotes (because leader has fallen)
       cancell(followerCancell)

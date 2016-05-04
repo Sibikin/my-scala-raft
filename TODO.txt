@@ -1,0 +1,8 @@
+2016.05.04
+- in follower when RequestVote is received at the moment this RequestVote is just processed but i think follower needs to convert to candidate (at least if it responds with a false) so it
+  can be elected too. update: there is something about not reacting to RequestVote in "Cluster membership changes" section
+- "If a follower or candidate crashes, then future RequestVote and AppendEntries RPCs sent to it will fail. Raft handles these failures by retrying indefinitely" - but currently RequestVote is
+  sent once for each server (maybe some sending actor with acknowledgement and resending needed, maybe without additional actor). update: on the other hand the election doesn't last long 
+  (re-election after some time) so maybe no need to resend RequestVote, but for AppendEntries it's needed
+- at the moment on receiving RequestVote in leader convertToFollower happens, why? (i don't remember). maybe convert to candidate or checking terms and staying leader should happen
+   
