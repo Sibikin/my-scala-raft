@@ -254,7 +254,7 @@ class Server(val id: Int) extends Actor {
     context.become(leader)
     postAction(ChangedToLeader(id))
     state = Leader
-    members.foreach(entry => if(entry._1!=id) entry._2 ! AppendEntries(currentTerm, id, 0, 0, List.empty[LogEntry], 0))
+    members.foreach(entry => if(entry._1!=id) entry._2 ! AppendEntries(currentTerm, id, 0, 0, List.empty[LogEntry], 0))  //TODO maybe real values in place of 0?
     // instead of scheduleOnce and recreating Cancellable - using schedule with no recreation (but
     // if there are a lot of client requests and leader needs to sent AppendEntries frequently maybe it's better
     // to use scheduleOnce)
