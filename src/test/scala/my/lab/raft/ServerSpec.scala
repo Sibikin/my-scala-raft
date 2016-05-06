@@ -23,7 +23,7 @@ class ServerSpec extends TestKit(ActorSystem("ServerSpec"))
     system.shutdown()
   }
   
-  /*
+  
   test("server should start in initialize state") {
     val init = TestProbe()
     val testServer = system.actorOf(Props(new ServerForTesting(0, init.ref, 500)), "testServer" + 0)
@@ -73,7 +73,10 @@ class ServerSpec extends TestKit(ActorSystem("ServerSpec"))
     
     //init.expectNoMsg(500.millisecond)
     //init.expectNoMsg(500.millisecond)
-    init.send(members.head._2, PoisonPill)
+    //init.send(members.head._2, PoisonPill)
+    for(server <- members.values) {
+      init.send(server, PoisonPill)
+    }
   }
   
   
@@ -109,7 +112,7 @@ class ServerSpec extends TestKit(ActorSystem("ServerSpec"))
     }
     
   }
-  */
+  
   
   test("leader must replicate messages") {
     val init = TestProbe()
@@ -138,6 +141,7 @@ class ServerSpec extends TestKit(ActorSystem("ServerSpec"))
   }
   
   
+  /*
   // testing can be done that way, but many limitations, see http://doc.akka.io/docs/akka/snapshot/scala/testing.html 
   test("test using TestActorRef") {
     
@@ -148,4 +152,6 @@ class ServerSpec extends TestKit(ActorSystem("ServerSpec"))
     assert(actor.state == Candidate)
     
   }
+  */
+  
 }
