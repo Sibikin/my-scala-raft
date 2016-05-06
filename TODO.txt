@@ -1,8 +1,12 @@
 2016.05.04
 - in follower when RequestVote is received at the moment this RequestVote is just processed but i think follower needs to convert to candidate (at least if it responds with a false) so it
-  can be elected too. update: there is something about not reacting to RequestVote in "Cluster membership changes" section
+  can be elected too. update: there is something about not reacting to RequestVote in "Cluster membership changes" section. update: on the other hand maybe no need to convert to candidate
+  because follower will vote and new leader can be elected, but if it won't be elected this follower need to somehow become a candidate (and now RequestVote refresh follower timeout,
+  maybe it shouldn't)
 - "If a follower or candidate crashes, then future RequestVote and AppendEntries RPCs sent to it will fail. Raft handles these failures by retrying indefinitely" - but currently RequestVote is
   sent once for each server (maybe some sending actor with acknowledgement and resending needed, maybe without additional actor). update: on the other hand the election doesn't last long 
   (re-election after some time) so maybe no need to resend RequestVote, but for AppendEntries it's needed
 - at the moment on receiving RequestVote in leader convertToFollower happens, why? (i don't remember). maybe convert to candidate or checking terms and staying leader should happen
-   
+- resending RequestVoteResponse (to guarantee message delivery)? see https://colin-scott.github.io/blog/2015/10/07/fuzzing-raft-for-fun-and-profit/#disqus_thread (raft-45: Candidates accept 
+  duplicate votes from the same election term.) - there is a bug due to resending. update: again, due to reelection after timeout maybe resending is not needed
+     
