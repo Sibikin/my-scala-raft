@@ -22,7 +22,8 @@ object ServiceMessages {
   // leaderId - in case client sent message not to the leader (boolean will be false)
   case class UpdateResult(val v: Boolean, val leaderId: Int)
   
-  //TODO messages to stop leader (or any replica) and to start them again (some flag in Server needed), maybe messages to check state of logs or commited state
+  //TODO messages to stop servers and to start them again (for testing to emulate failure of servers, after Suspend maybe convert to some new state, where all messages except Resume
+  //are discarded), maybe messages to check state of logs or commited state are also needed
   case class Suspend()
   case class Resume()
   

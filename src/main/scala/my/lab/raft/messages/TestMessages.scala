@@ -15,8 +15,8 @@ object TestMessages {
   case class ElectionStarted(id: Int, term: Long) extends TestMessage
   
   // val id - id of the server which recieved RequestVote
-  case class RequestVoteReceived(val id: Int, val term: Long, val candidateId: Int, val lastLogIndex: Int, val lastLogTerm: Int, val response: Boolean) extends TestMessage
+  case class RequestVoteReceived(val id: Int, val term: Long, val candidateId: Int, val lastLogIndex: Int, val lastLogTerm: Long, val response: Boolean) extends TestMessage
   
-  case class AppendEntriesReceived(val id: Int, val term: Long, val leaderId: Int, val prevLogIndex: Int, val prevLogTerm: Int, val entries: List[LogEntry], val leaderCommit: Int) extends TestMessage
+  case class AppendEntriesReceived(val id: Int, val term: Long, val leaderId: Int, val prevLogIndex: Int, val prevLogTerm: Long, val entries: List[LogEntry], val leaderCommit: Int) extends TestMessage
   
 }

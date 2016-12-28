@@ -17,7 +17,7 @@ object RaftMessages {
    * }
    * </pre>
    */
-  case class AppendEntries(val term: Long, val leaderId: Int, val prevLogIndex: Int, val prevLogTerm: Int, val entries: List[LogEntry], val leaderCommit: Int)
+  case class AppendEntries(val term: Long, val leaderId: Int, val prevLogIndex: Int, val prevLogTerm: Long, val entries: List[LogEntry], val leaderCommit: Int)
   
   /** 
    *  <pre>
@@ -27,8 +27,10 @@ object RaftMessages {
    *  }
    * </pre>
    */
-  case class AppendEntriesResponse(val term: Long, val success: Boolean)
-  
+  //case class AppendEntriesResponse(val term: Long, val success: Boolean)
+  //i've changed this message - added a field prevLogIndex and id of follower to monitor the number of responses in
+  //leader (instead id for messages can be used)
+  case class AppendEntriesResponse(val term: Long, val success: Boolean, val prevLogIndex: Int, val sereverId: Int)
     /** 
    *  <pre>
    *  {@code
@@ -43,7 +45,7 @@ object RaftMessages {
    *  }
    * </pre>
    */
-  case class RequestVote(val term: Long, val candidateId: Int, val lastLogIndex: Int, val lastLogTerm: Int)
+  case class RequestVote(val term: Long, val candidateId: Int, val lastLogIndex: Int, val lastLogTerm: Long)
   
     /** 
    *  <pre>
