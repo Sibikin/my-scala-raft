@@ -26,6 +26,7 @@ class ServerSpec extends TestKit(ActorSystem("ServerSpec"))
   }
   
   
+  
   test("server should start in initialize state") {
     val init = TestProbe()
     val testServer = system.actorOf(Props(new ServerForTesting(0, init.ref, 500)), "testServer" + 0)
@@ -50,7 +51,7 @@ class ServerSpec extends TestKit(ActorSystem("ServerSpec"))
     init.expectMsg(ChangedToFollower(1))
     //init.expectNoMsg(400.millisecond)
     init.send(members.head._2, GetState)
-    init.expectMsg("Follower")
+    init.expectMsg(Follower)
     //init.expectNoMsg(500.millisecond)
     init.send(members.head._2, PoisonPill)
     Thread.sleep(500)

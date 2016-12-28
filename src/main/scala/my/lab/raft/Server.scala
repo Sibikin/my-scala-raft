@@ -199,7 +199,7 @@ class Server(val id: Int) extends Actor {
         println("candidate " + id + " received greater term and converting to follower")
         cancell(candidateCancell)
         convertToFollower
-      } else {
+      } else if(responseTerm == currentTerm) {
         if(voteGranted) {
           numOfVotes += 1
           //If votes received from majority of servers: become leader
@@ -211,7 +211,7 @@ class Server(val id: Int) extends Actor {
       }
     }
     //If AppendEntries RPC received from new leader: convert to follower (Rules for Servers. Candidates (§5.2))
-    case AppendEntries(term,  leaderId,  prevLogIndex,  prevLogTerm,  entries,  leaderCommit) => {
+    case AppendEntries(term,  leaderId,  prevLogIndex,  prevLogTerm,  entries,  leaderCommit) => { //TODO what if entries contain some data (if it's possible at all)
       if(term >= currentTerm) {
         currentTerm = term
         votedFor = leaderId
@@ -232,8 +232,8 @@ class Server(val id: Int) extends Actor {
       candidateCancell = context.system.scheduler.scheduleOnce((candidateTimeoutFixed + candidateTimeoutRandom.nextInt(50)).millisecond)(self ! CandidateTimeout)
       startElection
     }
-    case Get(key) =>
-    case Update(key, value) =>
+    case Get(key) => // TODO
+    case Update(key, value) => // TODO
     case Suspend =>
     case _ =>
   }
@@ -409,8 +409,8 @@ class Server(val id: Int) extends Actor {
           } else {
             //terms are equal - at least 2 candidates, need to check if this server has already received any RequestVote's (if 
             //it received and voted positively votedFor won't be 0, if negatively - it'll be 0 - so this server can vote)
-            //TODO check it again
-            if(votedFor==0 || votedFor==candidateId) {
+            //if(votedFor==0 || votedFor==candidateId) { // why votedFor==candidateId? it was in spec but it's not needed i think
+            if(votedFor==0) {
               s ! RequestVoteResponse(currentTerm, true)
               postAction(RequestVoteReceived(id, requesterTerm, candidateId, lastLogIndex, lastLogTerm, true))
               println("RequestVote in " + id + " from " + candidateId + ", term=" + requesterTerm + ", voteGranted=" + true)
@@ -423,14 +423,15 @@ class Server(val id: Int) extends Actor {
             }
           }
         } else {  
-          currentTerm = requesterTerm
-          s ! RequestVoteResponse(currentTerm, false)
+          if(requesterTerm > currentTerm) {
+            currentTerm = requesterTerm
+            s ! RequestVoteResponse(currentTerm, false)
+            votedFor = 0  //set votedFor=0 in order to subsequent requests in this term's election can win it (because this server hasn't granted its voice in this term yet) 
+          } else { // request in same term - more than one candidate, just respond with refusal (do not set votedFor to 0, because this server maybe already has voted)
+            s ! RequestVoteResponse(currentTerm, false)
+          }          
           postAction(RequestVoteReceived(id, requesterTerm, candidateId, lastLogIndex, lastLogTerm, false))
           println("RequestVote in " + id + " from " + candidateId + ", term=" + requesterTerm + ", voteGranted=" + false)
-          
-          votedFor = 0  //set votedFor for 0 in order to subsequent requests in this term's election can win it (because this server hasn't voted yet in this term) 
-          // TODO not sure if everything is ok with this votedFor = 0 (need to think about it. what if this server voted true for some candidate, and received another request
-          // from another server and occured in this part of branch)
         } 
       }            
     }
